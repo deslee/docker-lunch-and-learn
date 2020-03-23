@@ -1,0 +1,44 @@
+version: '3.1'
+services:
+  mongo:
+    image: mongo:4
+    # ports:
+    #   - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+  sqs:
+    image: roribio16/alpine-sqs:latest
+    # ports:
+    #   - 9325:9325
+    #   - 9324:9324
+  api:
+    depends_on:
+      - mongo
+    build: ./api
+    environment:
+      MONGO_HOST: mongo
+      PORT: 3000
+    ports:
+      - 3000:3000
+  handler:
+    depends_on:
+      - sqs
+    build: ./handler
+    environment:
+      ENDPOINT: http://sqs:9324
+      PORT: 3001
+      AWS_ACCESS_KEY_ID: 'mock'
+      AWS_SECRET_ACCESS_KEY: 'mock'
+    ports:
+      - 3001:3001
+  processor:
+    depends_on:
+      - sqs
+      - mongo
+    build: ./processor
+    environment:
+      ENDPOINT: http://sqs:9324
+      MONGO_HOST: mongo
+      AWS_ACCESS_KEY_ID: 'mock'
+      AWS_SECRET_ACCESS_KEY: 'mock'
