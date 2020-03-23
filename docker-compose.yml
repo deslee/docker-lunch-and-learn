@@ -2,16 +2,11 @@ version: '3.1'
 services:
   mongo:
     image: mongo:4
-    # ports:
-    #   - 27017:27017
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password
   sqs:
     image: roribio16/alpine-sqs:latest
-    # ports:
-    #   - 9325:9325
-    #   - 9324:9324
   api:
     depends_on:
       - mongo
